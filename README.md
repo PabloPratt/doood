@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DOOOD — Day One Or One Day
 
-## Getting Started
+DOOOD is an AI-powered book completion platform that helps aspiring authors start, structure, and finish their books. 
 
-First, run the development server:
+## Features
+- **AI Book Blueprint:** Generate a custom chapter outline and writing plan based on your idea.
+- **Gamified Writing:** XP, streaks, and badges to keep you motivated.
+- **Progress Dashboard:** Track your word count and upcoming milestones.
+- **Community Campfire:** Connect with other authors and share your progress.
+
+## Tech Stack
+- **Frontend:** Next.js 16 (App Router), TypeScript, Tailwind CSS
+- **Animations:** Framer Motion
+- **Icons:** Lucide React
+- **AI:** Google Gemini API (via `@google/generative-ai`)
+- **Deployment:** Vercel
+
+## Local Setup
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Environment variables:**
+   Copy `.env.example` to `.env.local` if you want live Gemini generation:
+   ```
+   cp .env.example .env.local
+   GEMINI_API_KEY=your_key_here
+   ```
+   The app works without `GEMINI_API_KEY` by returning a mock blueprint from the server route.
+
+3. **Run locally:**
+   ```bash
+   npm run dev
+   ```
+   Open `http://localhost:3000`.
+
+4. **Build for production:**
+   ```bash
+   npm run build
+   ```
+
+5. **Lint:**
+   ```bash
+   npm run lint
+   ```
+
+## GitHub Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git init
+git add .
+git commit -m "Initial DOOOD MVP"
+git branch -M main
+git remote add origin [MY_GITHUB_REPO_URL]
+git push -u origin main
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deployment on Vercel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Push the repository to GitHub.
+2. Import the repository into Vercel.
+3. Vercel auto-detects Next.js and uses the default build command: `npm run build`.
+4. Add `GEMINI_API_KEY` in Project Settings > Environment Variables only if live Gemini generation is enabled.
+5. Deploy.
+6. Add a custom domain later from Project Settings > Domains.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
+- `/src/app`: Next.js App Router pages and API routes.
+- `/src/components`: UI components, layouts, and sections.
+- `/src/lib`: Utility functions and shared logic.
+- `/docs`: Product roadmap and database schema documentation.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Current Routes
+- `/`: Landing page
+- `/builder`: Multi-step book blueprint builder
+- `/dashboard`: Saved-project dashboard
+- `/projects`: Saved-project workspace
+- `/community`: Campfire progress feed
+- `/about`: Mission page
+- `/waitlist`: Early access form
+- `/signin`: Sign in page
+- `/signup`: Sign up page
+- `/api/generate-blueprint`: Server-only Gemini/mock blueprint endpoint
