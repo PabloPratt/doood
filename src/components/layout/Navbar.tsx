@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
-import { PenSquare } from 'lucide-react';
+import { FileUp, PenSquare } from 'lucide-react';
 import { AuthButtons } from '@/components/auth/AuthButtons';
 
 export const Navbar = () => {
@@ -19,11 +19,18 @@ export const Navbar = () => {
 
         <div className="hidden md:flex items-center space-x-8">
           <Link href="/projects" className="text-sm font-medium text-white/60 hover:text-white transition-colors">Projects</Link>
+          <Link href="/import" className="text-sm font-medium text-white/60 hover:text-white transition-colors">Import Draft</Link>
           <Link href="/about" className="text-sm font-medium text-white/60 hover:text-white transition-colors">About</Link>
           <Link href="/community" className="text-sm font-medium text-white/60 hover:text-white transition-colors">Community</Link>
         </div>
 
         <div className="flex items-center space-x-4">
+          <Link href="/import" className="hidden lg:block">
+            <Button size="sm" variant="outline" className="gap-2">
+              <FileUp className="w-4 h-4" />
+              <span>Import</span>
+            </Button>
+          </Link>
           <Link href="/builder">
             <Button size="sm" className="gap-2">
               <PenSquare className="w-4 h-4" />

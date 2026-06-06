@@ -5,10 +5,12 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/Button';
-import { ChevronLeft, Eye, Maximize2, Save, Trophy, Type, Zap } from 'lucide-react';
+import { ChevronLeft, Eye, Layers, Maximize2, Save, Trophy, Type, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { PROJECTS_KEY, type SavedProject } from '@/lib/storage';
+import { PROJECTS_KEY, type ManuscriptSection, type SavedProject } from '@/lib/storage';
 import { starterProjects } from '@/lib/starter-projects';
+
+type SectionMode = 'chapter' | 'page' | 'line';
 
 export default function EditorPage() {
   const params = useParams<{ id: string }>();
@@ -23,17 +25,52 @@ export default function EditorPage() {
     if (typeof window === 'undefined') return '';
     return window.localStorage.getItem(draftKey) ?? '';
   });
+  const [sectionMode, setSectionMode] = useState<SectionMode>('chapter');
+  const [activeSectionId, setActiveSectionId] = useState(() => project?.sections?.find((section) => section.type === 'chapter')?.id ?? '');
+  const [sections, setSections] = useState<ManuscriptSection[]>(() => project?.sections ?? []);
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [savedMessage, setSavedMessage] = useState('');
 
-  const wordCount = useMemo(() => (content.trim() ? content.trim().split(/\s+/).length : 0), [content]);
+  const filteredSections = useMemo(
+    () => sections.filter((section) => section.type === sectionMode),
+    [sectionMode, sections]
+  );
+  const activeSection = sections.find((section) => section.id === activeSectionId) ?? filteredSections[0];
+  const editorContent = activeSection ? activeSection.content : content;
+  const wordCount = useMemo(() => (editorContent.trim() ? editorContent.trim().split(/\s+/).length : 0), [editorContent]);
+  const hasImportedSections = sections.length > 0;
+
+  const changeMode = (mode: SectionMode) => {
+    setSectionMode(mode);
+    setActiveSectionId(sections.find((section) => section.type === mode)?.id ?? '');
+  };
+
+  const updateEditorContent = (value: string) => {
+    if (!activeSection) {
+      setContent(value);
+      return;
+    }
+
+    setSections((current) =>
+      current.map((section) => (section.id === activeSection.id ? { ...section, content: value } : section))
+    );
+  };
 
   const saveDraft = () => {
-    window.localStorage.setItem(draftKey, content);
+    if (!hasImportedSections) {
+      window.localStorage.setItem(draftKey, content);
+    }
+
     const storedProjects = window.localStorage.getItem(PROJECTS_KEY);
     const projects = storedProjects ? (JSON.parse(storedProjects) as SavedProject[]) : [];
+    const totalWords = hasImportedSections
+      ? sections.reduce((sum, section) => {
+          if (section.type !== 'chapter') return sum;
+          return sum + section.content.trim().split(/\s+/).filter(Boolean).length;
+        }, 0)
+      : wordCount;
     const updated = projects.map((item) =>
-      item.id === params.id ? { ...item, wordCount, updatedAt: new Date().toISOString() } : item
+      item.id === params.id ? { ...item, sections, wordCount: totalWords, updatedAt: new Date().toISOString() } : item
     );
     window.localStorage.setItem(PROJECTS_KEY, JSON.stringify(updated));
     setSavedMessage('Saved');
@@ -86,11 +123,63 @@ export default function EditorPage() {
           </div>
         </div>
 
-        <div className="mx-auto grid max-w-4xl gap-8 lg:grid-cols-4">
-          <div className="space-y-4 lg:col-span-3">
+        <div className={cn('mx-auto grid max-w-6xl gap-8', hasImportedSections ? 'lg:grid-cols-[280px_1fr_260px]' : 'lg:grid-cols-4')}>
+          {hasImportedSections && !isFocusMode ? (
+            <aside className="space-y-4">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <h2 className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-white/40">
+                  <Layers className="h-4 w-4 text-brand-purple" />
+                  Edit Mode
+                </h2>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['chapter', 'page', 'line'] as SectionMode[]).map((mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => changeMode(mode)}
+                      className={cn(
+                        'rounded-lg px-2 py-2 text-xs font-black uppercase transition-colors',
+                        sectionMode === mode ? 'bg-brand-purple text-white' : 'bg-white/5 text-white/45 hover:text-white'
+                      )}
+                    >
+                      {mode}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="max-h-[62vh] overflow-auto rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                <div className="mb-3 px-2 text-[10px] font-black uppercase tracking-widest text-white/35">
+                  {filteredSections.length} {sectionMode} sections
+                </div>
+                <div className="space-y-2">
+                  {filteredSections.map((section) => (
+                    <button
+                      key={section.id}
+                      onClick={() => setActiveSectionId(section.id)}
+                      className={cn(
+                        'w-full rounded-xl p-3 text-left transition-colors',
+                        activeSection?.id === section.id ? 'bg-brand-purple text-white' : 'bg-white/5 text-white/55 hover:bg-white/10 hover:text-white'
+                      )}
+                    >
+                      <span className="block text-sm font-black">{section.title}</span>
+                      <span className="mt-1 block truncate text-xs opacity-60">{section.content.slice(0, 80)}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </aside>
+          ) : null}
+
+          <div className={cn('space-y-4', hasImportedSections ? '' : 'lg:col-span-3')}>
+            {activeSection ? (
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-[10px] font-black uppercase tracking-widest text-brand-gold">{sectionMode} editor</p>
+                <h2 className="text-2xl font-black text-white">{activeSection.title}</h2>
+              </div>
+            ) : null}
             <textarea
-              value={content}
-              onChange={(event) => setContent(event.target.value)}
+              value={editorContent}
+              onChange={(event) => updateEditorContent(event.target.value)}
               placeholder="Start writing here..."
               className={cn(
                 'min-h-[60vh] w-full resize-none rounded-3xl border border-white/5 bg-white/[0.02] p-8 text-xl leading-relaxed text-white/90 outline-none transition-all focus:border-brand-purple/30 md:p-12',
@@ -102,6 +191,7 @@ export default function EditorPage() {
               <div className="flex items-center gap-6">
                 <Metric label="Word Count" value={String(wordCount)} />
                 <Metric label="Session XP" value={`+${Math.floor(wordCount / 10) * 5}`} accent />
+                {hasImportedSections ? <Metric label="Mode" value={sectionMode} /> : null}
               </div>
               <div className="flex items-center gap-4">
                 <button className="p-2 text-white/20 transition-colors hover:text-white" aria-label="Type settings">

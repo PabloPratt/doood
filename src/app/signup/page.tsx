@@ -19,7 +19,7 @@ export default function SignUpPage() {
       createdAt: new Date().toISOString(),
     };
     window.localStorage.setItem(USER_KEY, JSON.stringify(user));
-    window.location.href = '/builder';
+    window.location.href = '/import';
   };
 
   return (
@@ -29,7 +29,7 @@ export default function SignUpPage() {
         <div className="mb-8 text-center">
           <p className="mb-3 text-xs font-black uppercase tracking-[0.25em] text-brand-gold">Day One Or One Day</p>
           <h1 className="text-4xl font-black text-white md:text-6xl">CREATE YOUR DOOOD ACCOUNT.</h1>
-          <p className="mt-4 text-white/55">Make an account, build your first blueprint, and save it to your workspace.</p>
+          <p className="mt-4 text-white/55">Make an account, import an existing draft or build your first blueprint, and save it to your workspace.</p>
         </div>
 
         <form onSubmit={submit} className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 space-y-5">

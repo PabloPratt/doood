@@ -4,6 +4,8 @@
 - [x] Landing page with high-converting copy
 - [x] Multi-step Book Builder form
 - [x] Server-side blueprint generation route with Gemini-ready fallback
+- [x] Import existing drafts from paste, `.txt`, or `.md`
+- [x] Split imported manuscripts into chapter, page, and line edit modes
 - [x] Simulated dashboard with stats, quests, progress, and Graveyard
 - [x] Projects workspace with local saved projects
 - [x] Campfire community preview

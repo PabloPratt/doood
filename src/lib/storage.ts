@@ -4,6 +4,13 @@ export type DooodUser = {
   createdAt: string;
 };
 
+export type ManuscriptSection = {
+  id: string;
+  type: 'chapter' | 'page' | 'line';
+  title: string;
+  content: string;
+};
+
 export type SavedProject = {
   id: string;
   title: string;
@@ -24,6 +31,7 @@ export type SavedProject = {
     firstQuest?: string;
     nextActions?: string[];
   };
+  sections?: ManuscriptSection[];
   wordCount: number;
   createdAt: string;
   updatedAt: string;

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, FileUp, Sparkles } from 'lucide-react';
 
 export const Hero = () => {
   return (
@@ -31,24 +31,25 @@ export const Hero = () => {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-          <Link href="/builder">
-            <Button size="lg" className="group">
-              Start Your Book
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          <Link href="/import">
+            <Button size="lg" variant="secondary" className="group">
+              Import Existing Draft
+              <FileUp className="ml-2 w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
             </Button>
           </Link>
-          <Link href="/waitlist">
-            <Button size="lg" variant="outline">
-              Get Updates
+          <Link href="/builder">
+            <Button size="lg" className="group">
+              Start From Idea
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </Link>
         </div>
 
         <div className="mx-auto mt-14 grid max-w-3xl gap-3 text-left md:grid-cols-3">
           {[
-            ['1', 'Answer simple prompts', 'Book type, audience, tone, idea, length, and goal.'],
-            ['2', 'Generate a blueprint', 'Get a working title, chapter outline, milestones, and first quest.'],
-            ['3', 'Start the dashboard', 'Track progress, revive old ideas, and keep writing.'],
+            ['1', 'Import or start fresh', 'Bring in an existing draft, or answer prompts for a new book.'],
+            ['2', 'DOOOD pre-fills the workspace', 'Drafts become chapters, pages, line sections, milestones, and quests.'],
+            ['3', 'Edit in manageable passes', 'Work chapter by chapter, page by page, or line by line.'],
           ].map(([number, title, body]) => (
             <div key={number} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
               <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-brand-purple text-sm font-black text-white">{number}</div>

@@ -4,6 +4,7 @@ DOOOD is an AI-powered book completion platform that helps aspiring authors star
 
 ## Features
 - **AI Book Blueprint:** Generate a custom chapter outline and writing plan based on your idea.
+- **Draft Import:** Paste or upload an existing `.txt`/`.md` manuscript and split it into chapter, page, and line edit modes.
 - **Gamified Writing:** XP, streaks, and badges to keep you motivated.
 - **Progress Dashboard:** Track your word count and upcoming milestones.
 - **Community Campfire:** Connect with other authors and share your progress.
@@ -75,6 +76,7 @@ git push -u origin main
 ## Current Routes
 - `/`: Landing page
 - `/builder`: Multi-step book blueprint builder
+- `/import`: Upload or paste an existing manuscript and split it into editable sections
 - `/dashboard`: Saved-project dashboard
 - `/projects`: Saved-project workspace
 - `/community`: Campfire progress feed

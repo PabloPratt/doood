@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/Button';
-import { BookOpen, Clock, RotateCcw, Trophy } from 'lucide-react';
+import { BookOpen, Clock, FileUp, RotateCcw, Trophy } from 'lucide-react';
 import { PROJECTS_KEY, type SavedProject } from '@/lib/storage';
 import { starterProjects } from '@/lib/starter-projects';
 
@@ -28,9 +28,17 @@ export default function ProjectsPage() {
               Your actual book projects live here. Start with one of the existing concepts or create a new blueprint.
             </p>
           </div>
-          <Link href="/builder">
-            <Button size="lg">Create New Blueprint</Button>
-          </Link>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link href="/import">
+              <Button size="lg" variant="secondary" className="gap-2">
+                <FileUp className="h-5 w-5" />
+                Import Draft
+              </Button>
+            </Link>
+            <Link href="/builder">
+              <Button size="lg">Create New Blueprint</Button>
+            </Link>
+          </div>
         </div>
 
         {projects.length === 0 ? (
@@ -40,11 +48,16 @@ export default function ProjectsPage() {
             </div>
             <h2 className="mb-3 text-3xl font-black text-white">No saved books yet.</h2>
             <p className="mx-auto mb-8 max-w-xl text-white/50">
-              Start with the builder. When you create a blueprint, DOOOD will save it here so you can keep working.
+              Import an existing draft or start with the builder. DOOOD will save the project here so you can keep working.
             </p>
-            <Link href="/builder">
-              <Button size="lg">Build My First Book</Button>
-            </Link>
+            <div className="flex flex-col justify-center gap-3 sm:flex-row">
+              <Link href="/import">
+                <Button size="lg" variant="secondary">Import Existing Draft</Button>
+              </Link>
+              <Link href="/builder">
+                <Button size="lg">Build From Idea</Button>
+              </Link>
+            </div>
           </section>
         ) : (
           <div className="grid gap-6 lg:grid-cols-3">
@@ -63,7 +76,7 @@ export default function ProjectsPage() {
                 <p className="mb-6 text-sm text-white/55">{project.blueprint.promise}</p>
                 <div className="mb-6 grid grid-cols-2 gap-3">
                   <MiniStat label="Words" value={String(project.wordCount)} />
-                  <MiniStat label="Chapters" value={String(project.blueprint.chapters.length)} />
+                  <MiniStat label={project.sections?.length ? 'Sections' : 'Chapters'} value={String(project.sections?.length ?? project.blueprint.chapters.length)} />
                 </div>
                 <Link href={`/editor/${project.id}`}>
                   <Button variant="outline" className="w-full">Open Project</Button>
