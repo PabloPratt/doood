@@ -3,6 +3,7 @@
 import { ChangeEvent, FormEvent, useState } from 'react';
 import Link from 'next/link';
 import { FileText, Upload } from 'lucide-react';
+import mammoth from 'mammoth';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/Button';
 import { buildImportedProject } from '@/lib/import-manuscript';
@@ -17,6 +18,12 @@ export default function ImportPage() {
   const [fileName, setFileName] = useState('');
   const [error, setError] = useState('');
 
+  const readDocx = async (file: File) => {
+    const buffer = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer: buffer });
+    return result.value.trim();
+  };
+
   const readFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -24,13 +31,22 @@ export default function ImportPage() {
     setFileName(file.name);
     setError('');
 
-    if (!file.name.match(/\.(txt|md)$/i)) {
-      setError('For now, upload a .txt or .md file, or paste your manuscript below. DOCX import can be added next.');
+    if (!file.name.match(/\.(txt|md|docx)$/i)) {
+      setError('Upload a .txt, .md, or .docx file, or paste your manuscript below.');
       return;
     }
 
-    setManuscript(await file.text());
-    if (!title) setTitle(file.name.replace(/\.(txt|md)$/i, ''));
+    try {
+      const text = file.name.match(/\.docx$/i) ? await readDocx(file) : await file.text();
+      if (!text.trim()) {
+        setError('DOOOD could not find readable manuscript text in that file.');
+        return;
+      }
+      setManuscript(text);
+      if (!title) setTitle(file.name.replace(/\.(txt|md|docx)$/i, ''));
+    } catch {
+      setError('DOOOD could not read that file. Try exporting from Google Docs or Word as .docx, .txt, or .md and upload it again.');
+    }
   };
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -95,9 +111,14 @@ export default function ImportPage() {
 
             <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-white/15 bg-white/[0.02] p-6 text-center transition-colors hover:border-brand-purple/50">
               <Upload className="mb-3 h-7 w-7 text-brand-purple" />
-              <span className="font-black text-white">Upload .txt or .md</span>
-              <span className="mt-1 text-xs text-white/35">{fileName || 'DOCX support can be added next'}</span>
-              <input type="file" accept=".txt,.md,text/plain,text/markdown" onChange={readFile} className="hidden" />
+              <span className="font-black text-white">Upload .docx, .txt, or .md</span>
+              <span className="mt-1 text-xs text-white/35">{fileName || 'Google Docs users can export as .docx'}</span>
+              <input
+                type="file"
+                accept=".docx,.txt,.md,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown"
+                onChange={readFile}
+                className="hidden"
+              />
             </label>
           </section>
 
