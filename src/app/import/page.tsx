@@ -16,12 +16,70 @@ export default function ImportPage() {
   const [tone, setTone] = useState('');
   const [manuscript, setManuscript] = useState('');
   const [fileName, setFileName] = useState('');
+  const [googleDocUrl, setGoogleDocUrl] = useState('');
+  const [isImportingGoogleDoc, setIsImportingGoogleDoc] = useState(false);
   const [error, setError] = useState('');
 
   const readDocx = async (file: File) => {
     const buffer = await file.arrayBuffer();
     const result = await mammoth.extractRawText({ arrayBuffer: buffer });
     return result.value.trim();
+  };
+
+  const readHtml = async (file: File) => {
+    const html = await file.text();
+    return new DOMParser().parseFromString(html, 'text/html').body.textContent?.trim() || '';
+  };
+
+  const readRtf = async (file: File) => {
+    const rtf = await file.text();
+    return rtf
+      .replace(/\\'[0-9a-fA-F]{2}/g, (match) => String.fromCharCode(parseInt(match.slice(2), 16)))
+      .replace(/\\par[d]?/g, '\n')
+      .replace(/\\tab/g, ' ')
+      .replace(/\\[a-zA-Z]+-?\d* ?/g, '')
+      .replace(/[{}]/g, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  };
+
+  const importGoogleDoc = async (url: string, fallbackTitle?: string) => {
+    const normalizedUrl = url.trim();
+    if (!normalizedUrl) {
+      setError('Paste a Google Docs link first.');
+      return;
+    }
+
+    setError('');
+    setIsImportingGoogleDoc(true);
+
+    try {
+      const response = await fetch('/api/import-google-doc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: normalizedUrl }),
+      });
+      const result = (await response.json()) as { text?: string; error?: string };
+
+      if (!response.ok || !result.text) {
+        setError(result.error || 'DOOOD could not read that Google Doc.');
+        return;
+      }
+
+      setManuscript(result.text);
+      if (!title && fallbackTitle) setTitle(fallbackTitle.replace(/\.(gdoc)$/i, ''));
+    } catch {
+      setError('DOOOD could not connect to Google Docs. Export as .docx and upload it instead.');
+    } finally {
+      setIsImportingGoogleDoc(false);
+    }
+  };
+
+  const readPlainFile = async (file: File) => {
+    if (file.name.match(/\.docx$/i)) return readDocx(file);
+    if (file.name.match(/\.html?$/i)) return readHtml(file);
+    if (file.name.match(/\.rtf$/i)) return readRtf(file);
+    return file.text();
   };
 
   const readFile = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -31,21 +89,29 @@ export default function ImportPage() {
     setFileName(file.name);
     setError('');
 
-    if (!file.name.match(/\.(txt|md|docx)$/i)) {
-      setError('Upload a .txt, .md, or .docx file, or paste your manuscript below.');
+    if (!file.name.match(/\.(txt|md|docx|rtf|html?|gdoc)$/i)) {
+      setError('Upload a .docx, .txt, .md, .rtf, .html, or Google Docs shortcut file.');
       return;
     }
 
     try {
-      const text = file.name.match(/\.docx$/i) ? await readDocx(file) : await file.text();
+      if (file.name.match(/\.gdoc$/i)) {
+        const shortcut = JSON.parse(await file.text()) as { url?: string; doc_id?: string };
+        const url = shortcut.url || shortcut.doc_id || '';
+        setGoogleDocUrl(url);
+        await importGoogleDoc(url, file.name);
+        return;
+      }
+
+      const text = await readPlainFile(file);
       if (!text.trim()) {
         setError('DOOOD could not find readable manuscript text in that file.');
         return;
       }
       setManuscript(text);
-      if (!title) setTitle(file.name.replace(/\.(txt|md|docx)$/i, ''));
+      if (!title) setTitle(file.name.replace(/\.(txt|md|docx|rtf|html?)$/i, ''));
     } catch {
-      setError('DOOOD could not read that file. Try exporting from Google Docs or Word as .docx, .txt, or .md and upload it again.');
+      setError('DOOOD could not read that file. Try exporting from Google Docs or Word as .docx, .rtf, .txt, or .html and upload it again.');
     }
   };
 
@@ -84,7 +150,7 @@ export default function ImportPage() {
             <h2 className="mb-3 font-black text-white">How to use it today</h2>
             <ol className="space-y-3 text-sm text-white/55">
               <li>1. Paste or upload a draft.</li>
-              <li>2. Add quick context.</li>
+              <li>2. Or import a shared Google Doc.</li>
               <li>3. Open the editor by chapter, page, or line.</li>
             </ol>
           </div>
@@ -111,15 +177,38 @@ export default function ImportPage() {
 
             <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-white/15 bg-white/[0.02] p-6 text-center transition-colors hover:border-brand-purple/50">
               <Upload className="mb-3 h-7 w-7 text-brand-purple" />
-              <span className="font-black text-white">Upload .docx, .txt, or .md</span>
-              <span className="mt-1 text-xs text-white/35">{fileName || 'Google Docs users can export as .docx'}</span>
+              <span className="font-black text-white">Upload .docx, .txt, .md, .rtf, or .html</span>
+              <span className="mt-1 text-xs text-white/35">{fileName || 'Google Docs users can export as .docx or use a share link'}</span>
               <input
                 type="file"
-                accept=".docx,.txt,.md,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown"
+                accept=".docx,.txt,.md,.rtf,.html,.htm,.gdoc,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown,text/rtf,text/html"
                 onChange={readFile}
                 className="hidden"
               />
             </label>
+
+            <div className="rounded-2xl border border-white/10 bg-brand-black/30 p-4">
+              <label className="block">
+                <span className="mb-2 block text-[10px] font-black uppercase tracking-widest text-white/40">Google Docs Link</span>
+                <input
+                  value={googleDocUrl}
+                  onChange={(event) => setGoogleDocUrl(event.target.value)}
+                  className="field"
+                  placeholder="https://docs.google.com/document/d/..."
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() => importGoogleDoc(googleDocUrl)}
+                disabled={isImportingGoogleDoc}
+                className="mt-3 w-full rounded-full bg-white px-5 py-3 text-sm font-black text-brand-black transition-colors hover:bg-brand-gold disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isImportingGoogleDoc ? 'Importing...' : 'Import Google Doc'}
+              </button>
+              <p className="mt-3 text-xs leading-relaxed text-white/35">
+                The doc must be shared as viewable by anyone with the link. Private Drive access will need Google OAuth later.
+              </p>
+            </div>
           </section>
 
           <section className="rounded-3xl border border-white/10 bg-white/[0.03] p-6">
