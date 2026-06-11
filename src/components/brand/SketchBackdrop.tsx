@@ -58,17 +58,20 @@ export const SketchBackdrop = () => {
       </div>
       <div className="sketch-stage">
         {scenes.map((scene, index) => (
-          <svg
-            key={scene.label}
-            className="sketch-scene"
-            style={{ animationDelay: `${index * 3.2}s` }}
-            viewBox="0 0 256 192"
-            role="img"
-            aria-label={scene.label}
-          >
-            <path className="sketch-line" d={scene.lines.join(' ')} />
-            <path className="sketch-mark" d={scene.marks.join(' ')} />
-          </svg>
+          <div key={scene.label} className="sketch-cell">
+            <svg
+              className="sketch-scene"
+              style={{ animationDelay: `${index * -1.15}s` }}
+              viewBox="0 0 256 192"
+              role="img"
+              aria-label={scene.label}
+            >
+              <path className="sketch-line sketch-line--ghost" d={scene.lines.join(' ')} />
+              <path className="sketch-line" d={scene.lines.join(' ')} />
+              <path className="sketch-mark" d={scene.marks.join(' ')} />
+            </svg>
+            <span>{scene.label}</span>
+          </div>
         ))}
       </div>
     </div>
