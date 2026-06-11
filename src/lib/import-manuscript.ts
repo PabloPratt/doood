@@ -1,6 +1,42 @@
 import type { ManuscriptSection, SavedProject } from './storage';
 
+type ImportedChapter = {
+  title: string;
+  content: string;
+};
+
 const words = (text: string) => text.trim().split(/\s+/).filter(Boolean);
+
+const countryHeadings = new Set([
+  'Argentina',
+  'Belize',
+  'Bolivia',
+  'Brazil',
+  'Chile',
+  'Colombia',
+  'Costa Rica',
+  'Cuba',
+  'Dominican Republic',
+  'Ecuador',
+  'El Salvador',
+  'Guatemala',
+  'Guyana',
+  'Haiti',
+  'Honduras',
+  'Jamaica',
+  'Mexico',
+  'Nicaragua',
+  'Panama',
+  'Paraguay',
+  'Peru',
+  'Puerto Rico',
+  'Suriname',
+  'Trinidad and Tobago',
+  'Uruguay',
+  'Venezuela',
+]);
+
+const frontMatterHeadings = new Set(['Dedication', 'Introduction', 'The Book That Belonged to Everyone']);
 
 const chunkWords = (text: string, size: number) => {
   const allWords = words(text);
@@ -11,15 +47,87 @@ const chunkWords = (text: string, size: number) => {
   return chunks;
 };
 
-const getChapterChunks = (text: string) => {
+const isCountryHeading = (line: string) => countryHeadings.has(line.trim());
+
+const isFrontMatterHeading = (line: string) => frontMatterHeadings.has(line.trim());
+
+const isLikelySubtitle = (line: string) => {
+  const trimmed = line.trim();
+  if (!trimmed || trimmed.length > 95) return false;
+  if (/^(the tale|the tale begins|back in the bedroom)/i.test(trimmed)) return false;
+  if (/[.!?]$/.test(trimmed)) return false;
+  return words(trimmed).length <= 10;
+};
+
+const nextNonEmptyLine = (lines: string[], startIndex: number) => {
+  for (let index = startIndex; index < lines.length; index += 1) {
+    const line = lines[index].trim();
+    if (line) return line;
+  }
+  return '';
+};
+
+const getStructuredChapters = (text: string): ImportedChapter[] => {
+  const normalized = text.replace(/\r\n/g, '\n').replace(/^\uFEFF/, '').trim();
+  const lines = normalized.split('\n').map((line) => line.trim());
+  const headingIndexes: number[] = [];
+
+  lines.forEach((line, index) => {
+    if (isCountryHeading(line) || isFrontMatterHeading(line)) {
+      headingIndexes.push(index);
+    }
+  });
+
+  if (headingIndexes.length < 3) return [];
+
+  const chapters: ImportedChapter[] = [];
+
+  if (headingIndexes[0] > 0) {
+    const opening = lines.slice(0, headingIndexes[0]).join('\n').trim();
+    if (opening.length > 80) {
+      chapters.push({ title: 'Opening Matter', content: opening });
+    }
+  }
+
+  headingIndexes.forEach((headingIndex, index) => {
+    const nextHeadingIndex = headingIndexes[index + 1] ?? lines.length;
+    const heading = lines[headingIndex];
+    const subtitle = nextNonEmptyLine(lines, headingIndex + 1);
+    const title = isLikelySubtitle(subtitle) && subtitle !== heading ? `${heading}: ${subtitle}` : heading;
+    const content = lines.slice(headingIndex, nextHeadingIndex).join('\n').trim();
+
+    if (content.length > 80) {
+      chapters.push({ title, content });
+    }
+  });
+
+  return chapters;
+};
+
+const getChapterChunks = (text: string): ImportedChapter[] => {
+  const structured = getStructuredChapters(text);
+  if (structured.length > 1) return structured;
+
   const normalized = text.replace(/\r\n/g, '\n').trim();
   const parts = normalized
     .split(/\n(?=(chapter|part|section)\s+[\w\divx]+[:\s-])/gi)
     .map((part) => part.trim())
     .filter((part) => part.length > 80);
 
-  if (parts.length > 1) return parts;
-  return chunkWords(normalized, 1200);
+  if (parts.length > 1) {
+    return parts.map((content, index) => {
+      const firstLine = content.split('\n').find(Boolean)?.replace(/^#+\s*/, '').trim();
+      return {
+        title: firstLine && firstLine.length < 90 ? firstLine : `Imported Chapter ${index + 1}`,
+        content,
+      };
+    });
+  }
+
+  return chunkWords(normalized, 1200).map((content, index) => ({
+    title: `Imported Chapter ${index + 1}`,
+    content,
+  }));
 };
 
 export const buildImportedProject = (input: {
@@ -41,11 +149,11 @@ export const buildImportedProject = (input: {
     .slice(0, 80);
 
   const sections: ManuscriptSection[] = [
-    ...chapterChunks.map((content, index) => ({
+    ...chapterChunks.map((chapter, index) => ({
       id: `chapter-${index + 1}`,
       type: 'chapter' as const,
-      title: `Chapter ${index + 1}`,
-      content,
+      title: chapter.title,
+      content: chapter.content,
     })),
     ...pageChunks.map((content, index) => ({
       id: `page-${index + 1}`,
@@ -61,10 +169,7 @@ export const buildImportedProject = (input: {
     })),
   ];
 
-  const firstChapterTitles = chapterChunks.slice(0, 6).map((content, index) => {
-    const firstLine = content.split('\n').find(Boolean)?.replace(/^#+\s*/, '').trim();
-    return firstLine && firstLine.length < 90 ? firstLine : `Imported Chapter ${index + 1}`;
-  });
+  const firstChapterTitles = chapterChunks.slice(0, 8).map((chapter) => chapter.title);
 
   return {
     id: crypto.randomUUID(),
