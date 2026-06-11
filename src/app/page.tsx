@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { Target, Zap, ShieldCheck, Brain, Flame, RotateCcw, Network } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { DooodLogo } from '@/components/brand/DooodLogo';
 
 export default function Home() {
   return (
@@ -120,10 +121,7 @@ export default function Home() {
       <footer className="py-12 border-t border-white/10 bg-brand-black">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center space-x-2 mb-8 md:mb-0">
-            <div className="w-6 h-6 bg-brand-purple rounded flex items-center justify-center">
-              <span className="text-white text-xs font-black">D</span>
-            </div>
-            <span className="text-lg font-black tracking-tighter text-white">DOOOD</span>
+            <DooodLogo compact />
           </div>
           <div className="flex space-x-8 text-white/40 text-sm">
             <Link href="/about" className="hover:text-white transition-colors">About</Link>

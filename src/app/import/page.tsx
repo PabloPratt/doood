@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FileText, Upload } from 'lucide-react';
 import mammoth from 'mammoth';
 import { Navbar } from '@/components/layout/Navbar';
+import { SketchBackdrop } from '@/components/brand/SketchBackdrop';
 import { Button } from '@/components/ui/Button';
 import { buildImportedProject } from '@/lib/import-manuscript';
 import { PROJECTS_KEY, type SavedProject } from '@/lib/storage';
@@ -132,10 +133,11 @@ export default function ImportPage() {
   };
 
   return (
-    <main className="min-h-screen bg-brand-black pt-32 pb-20">
+    <main className="relative min-h-screen overflow-hidden bg-brand-black pt-32 pb-20">
+      <SketchBackdrop />
       <Navbar />
 
-      <div className="container mx-auto max-w-5xl px-4">
+      <div className="container relative z-10 mx-auto max-w-5xl px-4">
         <div className="mb-10 grid gap-8 lg:grid-cols-[1fr_360px] lg:items-end">
           <div>
             <p className="mb-3 text-xs font-black uppercase tracking-[0.25em] text-brand-gold">Import Existing Draft</p>
