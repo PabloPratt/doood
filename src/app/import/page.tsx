@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { FileText, Upload } from 'lucide-react';
 import mammoth from 'mammoth';
 import { Navbar } from '@/components/layout/Navbar';
-import { SketchBackdrop } from '@/components/brand/SketchBackdrop';
 import { Button } from '@/components/ui/Button';
 import { buildImportedProject } from '@/lib/import-manuscript';
 import { PROJECTS_KEY, type SavedProject } from '@/lib/storage';
@@ -134,7 +133,6 @@ export default function ImportPage() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-brand-black pt-32 pb-20">
-      <SketchBackdrop />
       <Navbar />
 
       <div className="container relative z-10 mx-auto max-w-5xl px-4">

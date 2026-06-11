@@ -1,12 +1,10 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { ArrowRight, FileUp, Sparkles } from 'lucide-react';
-import { SketchBackdrop } from '@/components/brand/SketchBackdrop';
 
 export const Hero = () => {
   return (
     <section className="relative pt-32 pb-20 overflow-hidden">
-      <SketchBackdrop />
       {/* Background Glows */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-6xl pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-purple/20 blur-[120px] rounded-full" />
