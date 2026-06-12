@@ -128,7 +128,7 @@ export default function BuilderPage() {
 
   if (blueprint) {
     return (
-      <main className="min-h-screen bg-red-700 pt-32 pb-20">
+      <main className="min-h-screen bg-brand-black pt-32 pb-20">
         <Navbar />
         <div className="container mx-auto px-4 max-w-4xl">
            <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-8 md:p-12">
@@ -206,7 +206,7 @@ export default function BuilderPage() {
   }
 
   return (
-    <main className="min-h-screen bg-red-700 pt-32 pb-20">
+    <main className="min-h-screen bg-brand-black pt-32 pb-20">
       <Navbar />
       
       <div className="container mx-auto px-4 max-w-3xl">

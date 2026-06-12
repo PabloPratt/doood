@@ -132,7 +132,7 @@ export default function ImportPage() {
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-red-700 pt-32 pb-20">
+    <main className="relative min-h-screen overflow-hidden bg-brand-black pt-32 pb-20">
       <Navbar />
 
       <div className="container relative z-10 mx-auto max-w-5xl px-4">
@@ -187,7 +187,7 @@ export default function ImportPage() {
               />
             </label>
 
-            <div className="rounded-2xl border border-white/10 bg-red-700/30 p-4">
+            <div className="rounded-2xl border border-white/10 bg-brand-black/30 p-4">
               <label className="block">
                 <span className="mb-2 block text-[10px] font-black uppercase tracking-widest text-white/40">Google Docs Link</span>
                 <input
@@ -226,7 +226,7 @@ export default function ImportPage() {
               value={manuscript}
               onChange={(event) => setManuscript(event.target.value)}
               placeholder="Paste your existing draft here..."
-              className="min-h-[460px] w-full resize-y rounded-2xl border border-white/10 bg-red-700/60 p-5 text-base leading-relaxed text-white outline-none transition-colors focus:border-brand-purple"
+              className="min-h-[460px] w-full resize-y rounded-2xl border border-white/10 bg-brand-black/60 p-5 text-base leading-relaxed text-white outline-none transition-colors focus:border-brand-purple"
             />
             {error ? <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm font-bold text-red-200">{error}</div> : null}
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">

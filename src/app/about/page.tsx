@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-red-700 pt-32 pb-20">
+    <main className="min-h-screen bg-brand-black pt-32 pb-20">
       <Navbar />
       
       <div className="container mx-auto px-4 max-w-4xl">
