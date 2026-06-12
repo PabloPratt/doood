@@ -79,7 +79,7 @@ export default function EditorPage() {
 
   if (!project) {
     return (
-      <main className="min-h-screen bg-brand-black pt-32 pb-20">
+      <main className="min-h-screen bg-red-700 pt-32 pb-20">
         <Navbar />
         <div className="container mx-auto max-w-2xl px-4 text-center">
           <h1 className="mb-4 text-4xl font-black text-white">Project not found.</h1>
@@ -93,7 +93,7 @@ export default function EditorPage() {
   }
 
   return (
-    <main className={cn('min-h-screen transition-colors duration-500', isFocusMode ? 'bg-brand-black' : 'bg-[#050505]')}>
+    <main className="min-h-screen bg-red-700 transition-colors duration-500">
       {!isFocusMode && <Navbar />}
 
       <div className={cn('container mx-auto px-4 transition-all duration-500', isFocusMode ? 'pt-12' : 'pt-24')}>

@@ -19,7 +19,7 @@ export default function DashboardPage() {
   const totalWords = useMemo(() => projects.reduce((sum, project) => sum + project.wordCount, 0), [projects]);
 
   return (
-    <main className="min-h-screen bg-brand-black pt-24 pb-20">
+    <main className="min-h-screen bg-red-700 pt-24 pb-20">
       <Navbar />
 
       <div className="container mx-auto px-4">

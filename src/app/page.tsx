@@ -8,7 +8,7 @@ import { DooodLogo } from '@/components/brand/DooodLogo';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-brand-black overflow-x-hidden">
+    <main className="min-h-screen bg-red-700 overflow-x-hidden">
       <Navbar />
       <Hero />
 
@@ -118,7 +118,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 border-t border-white/10 bg-brand-black">
+      <footer className="py-12 border-t border-white/10 bg-red-700">
         <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center space-x-2 mb-8 md:mb-0">
             <DooodLogo compact />
@@ -159,7 +159,7 @@ function Step({ number, title, description, reverse = false }: { number: string,
       <div className="flex-1 w-full aspect-video bg-white/5 rounded-3xl border border-white/10 relative overflow-hidden group">
          <div className="absolute inset-0 bg-gradient-to-br from-brand-purple/20 to-brand-blue/20 opacity-50 group-hover:opacity-100 transition-opacity" />
          {/* Placeholder for actual image/UI mockup */}
-         <div className="absolute inset-8 border border-white/10 rounded-xl bg-brand-black/40 backdrop-blur-sm shadow-2xl flex items-center justify-center font-mono text-white/20">
+         <div className="absolute inset-8 border border-white/10 rounded-xl bg-red-700/40 backdrop-blur-sm shadow-2xl flex items-center justify-center font-mono text-white/20">
            [ {title} UI PREVIEW ]
          </div>
       </div>
